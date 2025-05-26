@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>YouTube Trending Viewer</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #eee; }
+    img { width: 100px; height: auto; }
+    .top10 { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>🔥 YouTube Trending (TH)</h1>
+  <table id="videoTable">
+    <thead>
+      <tr>
+        <th>รูป</th>
+        <th>ลำดับ</th>
+        <th>ชื่อวิดีโอ</th>
+        <th>ช่อง</th>
+        <th>ยอดวิว</th>
+        <th>โพสต์เมื่อ</th>
+        <th>หมวดหมู่</th>
+        <th>จัดการ</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const API = 'http://localhost:3001/videos';
+
+    async function loadVideos() {
+      const res = await fetch(API);
+      const videos = await res.json();
+
+      const tbody = document.querySelector("#videoTable tbody");
+      tbody.innerHTML = '';
+
+      videos.forEach((v, index) => {
+        const tr = document.createElement('tr');
+        if (index < 10) tr.classList.add("top10");
+
+        tr.innerHTML = `
+          <td><img src="${v.image}" alt="thumb" /></td>
+          <td>${v.ลำดับ}</td>
+          <td>${v.ชื่อวิดีโอ}</td>
+          <td>${v.ช่อง}</td>
+          <td>${v.ยอดวิว}</td>
+          <td>${v.เวลาโพสต์}</td>
+          <td>${v.หมวดหมู่}</td>
+          <td>
+            <button onclick="deleteVideo(${index})">ลบ</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function deleteVideo(index) {
+      if (!confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) return;
+
+      await fetch(`${API}/${index}`, { method: 'DELETE' });
+      loadVideos();
+    }
+
+    loadVideos();
+  </script>
+</body>
+</html>
